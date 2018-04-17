@@ -1,22 +1,19 @@
 pipeline {
-  agent {
-    docker {
-      image 'golang:1.10.1-alpine'
-      label 'docker-cloud'
-    }
-    
-  }
+  agent any
   stages {
     stage('Hello') {
       steps {
-        echo 'HI'
         echo 'Hellooo'
+        echo "${TEST_USER_USR}"
+        echo "${TEST_USER_PSW}"
       }
     }
-    stage('Hello1') {
-      steps {
-        echo 'Hellooo1'
-      }
-    }
+  }
+  environment {
+    MY_NAME = 'Mary'
+    TEST_USER = credentials('test-user')
+  }
+  parameters {
+    string(name: 'Name', defaultValue: 'whoever you are', description: 'Who should I say hi to?')
   }
 }
