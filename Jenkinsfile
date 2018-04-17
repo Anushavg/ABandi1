@@ -3,17 +3,16 @@ pipeline {
   stages {
     stage('Hello') {
       steps {
-        echo 'Hellooo'
-        echo "${TEST_USER_USR}"
-        echo "${TEST_USER_PSW}"
+        echo "Hellooo ${params.Namae}!"
       }
     }
-  }
-  environment {
-    MY_NAME = 'Mary'
-    TEST_USER = credentials('test-user')
-  }
-  parameters {
-    string(name: 'Name', defaultValue: 'whoever you are', description: 'Who should I say hi to?')
+    stage('Deploy') {
+      input {
+        message 'Should we continue?'
+      }
+      steps {
+        echo 'Continuing with deployment'
+      }
+    }
   }
 }
