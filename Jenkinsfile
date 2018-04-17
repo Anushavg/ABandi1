@@ -3,59 +3,30 @@ pipeline {
   stages {
     stage('Hello') {
       steps {
-        echo "Hellooo ${params.Namae}!"
+        echo "Hellooo ${MY_Namae}!"
       }
     }
-    stage('Get Kernel') {
-      steps {
-        script {
-          try {
-            KERNEL_VERSION = sh (script: "uname -r", returnStdout: true)
-          } catch(err) {
-            echo "CAUGHT ERROR: ${err}"
-            throw err
+    stage('Testing') {
+      failFast true
+      parallel {
+        stage('Java 7') {
+          agent {
+            docker 'openjdk:7-jdk-alpine'
+          }
+          steps {
+            sh 'java -version'
+            sleep(time: 10, unit: 'SECONDS')
           }
         }
-        
-      }
-    }
-    stage('Say Kernel') {
-      steps {
-        echo "${KERNEL_VERSION}"
-      }
-    }
-    stage('Deploy') {
-      options {
-        timeout(time: 20, unit: 'MINUTES')
-      }
-      input {
-        message 'Which Version?'
-        id 'Deploy'
-        parameters {
-          choice(name: 'APP_VERSION', choices: '''v1.1
-v1.2
-v1.3''', description: 'What to deploy?')
+        stage('Java 8') {
+          agent {
+            docker 'openjdk:8-jdk-alpine'
+          }
+          steps {
+            sh 'java -version'
+            sleep(time: 20, unit: 'SECONDS')
+          }
         }
-      }
-      steps {
-        echo "Deploying ${APP_VERSION}."
-      }
-    }
-    stage('Deploy1') {
-      options {
-        timeout(time: 1, unit: 'MINUTES')
-      }
-      input {
-        message 'Which Version?'
-        id 'Deploy'
-        parameters {
-          choice(name: 'APP_VERSION', choices: '''v1.1
-v1.2
-v1.3''', description: 'What to deploy?')
-        }
-      }
-      steps {
-        echo "Deploying ${APP_VERSION}."
       }
     }
   }
